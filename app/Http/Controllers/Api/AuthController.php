@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Auth;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Exception;
 
@@ -26,7 +27,12 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
-            return response()->json($user);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'user' => $user,
+                'token' => $token
+            ]);
         } catch (Exception $ex) {
             return response()->json([
                 'status' => 'error',
@@ -35,37 +41,52 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+
+    public function login(LoginRequest $request)
     {
-        //
+        $user = User::where('email', $request->email)->first();
+
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return response([
+                'message' => 'Bad creds'
+            ], 401);
+        }
+
+
+        $user = Auth::user();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+
+        return [
+            'user' => $user,
+            'token' => $token
+        ];
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+
+    public function profile()
     {
-        //
+        $user = Auth::user();
+
+        if (!$user) return response()->json([
+            'error' => 'Unauthenticated.'
+        ]);
+
+        return response()->json($user);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+
+    public function logout()
     {
-        //
+        $user = Auth::user();
+
+        if (!$user) return response()->json([
+            'error' => 'Unauthenticated.'
+        ]);
+
+        $user->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'user is logout']);
     }
 }
