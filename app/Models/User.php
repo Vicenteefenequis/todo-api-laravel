@@ -73,4 +73,9 @@ class User extends Authenticatable
     ];
 
     public $incrementing = false;
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }
