@@ -4,66 +4,63 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\CategoryUpdateRequest;
-use App\Models\Category;
-use Auth;
-use Illuminate\Http\Request;
+use App\Services\Category\{
+    CreateCategoryService,
+    ListCategoryService,
+    ListCategoriesService,
+    DeleteCategoryService,
+    UpdateCategoryService
+};
+use App\Services\DTO\Category\CategoryInputDto;
+use App\Services\DTO\Category\Update\CategoryUpdateInputDto;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use PHPUnit\Exception;
 
 class CategoryController extends Controller
 {
 
-    public function index(Request $request)
+    public function __construct(
+        private readonly CreateCategoryService $createCategory,
+        private readonly ListCategoriesService $listCategories,
+        private readonly ListCategoryService $listCategory,
+        private readonly UpdateCategoryService $updateCategory,
+        private readonly DeleteCategoryService $deleteCategory
+    ) {}
+
+    public function index(): JsonResponse
     {
-        $user = Auth::user();
-        $categories = $user->categories()->get();
-        return response()->json($categories);
+        $output = $this->listCategories->execute();
+        return response()->json($output);
     }
 
     public function show($id)
     {
-        $category = Category::findOrFail($id);
-
-        return response()->json($category);
+        $output = $this->listCategory->execute(new CategoryInputDto(id: $id));
+        return response()->json($output);
     }
 
 
     public function store(CategoryRequest $request)
     {
-        try {
-            $user = Auth::user();
+        $output = $this->createCategory->execute($request->toDTO());
 
-            $category = $user->categories()->create([
-                'name' => $request->name,
-                'color' => $request->color
-            ]);
-
-            return response()->json($category, 201);
-        } catch (Exception $ex) {
-            return response()->json([
-                'error' => $ex->getMessage()
-            ]);
-        }
+        return response()->json($output);
     }
 
-    public function update(CategoryUpdateRequest $request, $id)
+    public function update(CategoryUpdateRequest $request, string $id)
     {
-        $category = Category::findOrFail($id);
-
-        $category->update([
-            'name' => $request->name,
-            'color' => $request->color
-        ]);
-
-        return response()->json($category);
+        $output = $this->updateCategory->execute(new CategoryUpdateInputDto(
+            id: $id,
+            name: $request->name,
+            color: $request->color
+        ));
+        return response()->json($output);
     }
 
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
+        $output = $this->deleteCategory->execute(new CategoryInputDto(id: $id));
 
-        $category->delete();
-
-        return response(null, 204);
+        return response()->json($output);
     }
 }
