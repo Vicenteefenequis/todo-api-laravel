@@ -6,18 +6,21 @@ namespace App\Services\Category;
 use App\Models\Category;
 use App\Services\DTO\Category\Update\CategoryUpdateInputDto;
 use App\Services\DTO\Category\Update\CategoryUpdateOutputDto;
-use App\Services\Exception\CategoryException;
+use App\Services\Exception\{
+    NotFoundException,
+    EntityValidationException
+};
 
 class UpdateCategoryService
 {
     public function execute(CategoryUpdateInputDto $input): CategoryUpdateOutputDto
     {
 
-        if (!$this->isValidHexColor($input->color)) throw CategoryException::colorNotValid();
+        if (!$this->isValidHexColor($input->color)) throw new EntityValidationException('Color is not valid!');
 
         $category =  Category::find($input->id);
 
-        if (!$category) throw CategoryException::notFound($input->id);
+        if (!$category) throw new NotFoundException(sprintf('category with id %s not found', $input->id));
 
         $category->update([
             'name' => $input->name,

@@ -5,17 +5,16 @@ namespace App\Services\Category;
 
 use App\Services\DTO\Category\Create\CategoryCreateInputDto;
 use App\Services\DTO\Category\Create\CategoryCreateOutputDto;
-use App\Services\Exception\CategoryException;
+use App\Services\Exception\EntityValidationException;
 use Auth;
 
 class CreateCategoryService
 {
     public function execute(CategoryCreateInputDto $input): CategoryCreateOutputDto
     {
-
         $user = Auth::user();
 
-        if (!$this->isValidHexColor($input->color)) throw CategoryException::colorNotValid();
+        if (!$this->isValidHexColor($input->color)) throw new EntityValidationException('Color is not valid!');
 
         $category = $user->categories()->create([
             'name' => $input->name,
