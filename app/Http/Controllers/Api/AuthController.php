@@ -27,12 +27,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'user' => $user,
-                'token' => $token
-            ]);
+            return response()->json($user);
         } catch (Exception $ex) {
             return response()->json([
                 'status' => 'error',
@@ -58,10 +53,9 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
 
-        return [
-            'user' => $user,
+        return response([
             'token' => $token
-        ];
+        ]);
     }
 
 
