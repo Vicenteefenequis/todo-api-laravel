@@ -44,7 +44,7 @@ class CategoryController extends Controller
     {
         $output = $this->createCategory->execute($request->toDTO());
 
-        return response()->json($output);
+        return response()->json($output, 201);
     }
 
     public function update(CategoryUpdateRequest $request, string $id)
