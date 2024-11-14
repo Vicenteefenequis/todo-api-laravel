@@ -15,7 +15,9 @@ class DeleteCategoryService
     {
         $category = Auth::user()->categories()->find($input->id);
 
-        if (!$category) throw new NotFoundException(sprintf('Category not found with id %s', $input->id));
+        if (!$category) {
+            throw new NotFoundException(sprintf('Category not found with id %s', $input->id));
+        }
 
         return new CategoryDeleteOutputDto(success: $category->delete());
     }

@@ -14,7 +14,9 @@ class CreateCategoryService
     {
         $user = Auth::user();
 
-        if (!$this->isValidHexColor($input->color)) throw new EntityValidationException('Color is not valid!');
+        if (!$this->isValidHexColor($input->color)) {
+            throw new EntityValidationException('Color is not valid!');
+        }
 
         $category = $user->categories()->create([
             'name' => $input->name,

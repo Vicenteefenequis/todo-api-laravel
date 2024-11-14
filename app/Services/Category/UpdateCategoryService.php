@@ -15,12 +15,15 @@ class UpdateCategoryService
 {
     public function execute(CategoryUpdateInputDto $input): CategoryUpdateOutputDto
     {
-
-        if (!$this->isValidHexColor($input->color)) throw new EntityValidationException('Color is not valid!');
-
         $category =  Category::find($input->id);
 
-        if (!$category) throw new NotFoundException(sprintf('category with id %s not found', $input->id));
+        if (!$category) {
+            throw new NotFoundException(sprintf('category with id %s not found', $input->id));
+        }
+
+        if (!$this->isValidHexColor($input->color)) {
+            throw new EntityValidationException('Color is not valid!');
+        }
 
         $category->update([
             'name' => $input->name,
