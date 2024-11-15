@@ -5,15 +5,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTodo;
+use App\Services\DTO\Todo\TodoInputDto;
 use App\Services\Todo\CreateTodoService;
-use App\Services\Todo\ListTodosServices;
+use App\Services\Todo\ListTodoService;
+use App\Services\Todo\ListTodosService;
 use Illuminate\Http\JsonResponse;
 
 class TodoController extends Controller
 {
-    public function index(ListTodosServices $listTodosServices): JsonResponse
+    public function index(ListTodosService $listTodosServices): JsonResponse
     {
         $output = $listTodosServices->execute();
+        return response()->json($output);
+    }
+
+    public function show(string $id, ListTodoService $listTodoService)
+    {
+        $output = $listTodoService->execute(new TodoInputDto(id: $id));
         return response()->json($output);
     }
 
