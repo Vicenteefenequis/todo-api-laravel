@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTodo;
 use App\Services\DTO\Todo\TodoInputDto;
 use App\Services\Todo\CreateTodoService;
+use App\Services\Todo\DeleteTodoService;
 use App\Services\Todo\ListTodoService;
 use App\Services\Todo\ListTodosService;
 use Illuminate\Http\JsonResponse;
@@ -29,5 +30,11 @@ class TodoController extends Controller
     {
         $output = $createTodoService->execute($request->toDTO());
         return response()->json($output, 201);
+    }
+
+    public function destroy(string $id, DeleteTodoService $deleteTodoService)
+    {
+        $output = $deleteTodoService->execute(new TodoInputDto(id: $id));
+        return response()->json($output);
     }
 }
