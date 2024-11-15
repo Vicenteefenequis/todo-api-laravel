@@ -141,4 +141,33 @@ class TodoTest extends TestCase
             'message' => 'Todo with id not_found_id not found'
         ]);
     }
+
+    public function test_user_todo_delete_with_success()
+    {
+
+        $todo = Todo::factory()->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+        $response = $this->actingAs($this->user)->deleteJson("/api/todos/{$todo->id}");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+    }
+
+    public function test_user_todo_delete_not_found()
+    {
+
+        $response = $this->actingAs($this->user)->deleteJson("/api/todos/not_found_id");
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Todo with id not_found_id not found'
+        ]);
+    }
+
+
 }
