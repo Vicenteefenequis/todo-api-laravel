@@ -112,4 +112,33 @@ class TodoTest extends TestCase
 
         $response->assertJsonCount($count_items, 'items');
     }
+
+    public function test_user_todo_find_with_success()
+    {
+
+        $todo = Todo::factory()->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson("/api/todos/{$todo->id}");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'id' => $todo->id
+        ]);
+    }
+
+    public function test_user_todo_find_not_found()
+    {
+
+
+
+        $response = $this->actingAs($this->user)->getJson("/api/todos/not_found_id");
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Todo with id not_found_id not found'
+        ]);
+    }
 }
