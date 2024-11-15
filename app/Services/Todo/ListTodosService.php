@@ -5,7 +5,7 @@ namespace App\Services\Todo;
 use App\Services\DTO\Todo\List\TodoListOutputDto;
 use Illuminate\Support\Facades\Auth;
 
-class ListTodosServices
+class ListTodosService
 {
     public function execute(): TodoListOutputDto
     {
