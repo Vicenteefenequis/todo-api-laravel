@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Todo;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -84,4 +85,31 @@ class TodoTest extends TestCase
         ]);
     }
 
+    public function test_user_todo_list_with_success(): void
+    {
+        $count_items = 3;
+
+        Todo::factory()->count($count_items)->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+
+        $response = $this->actingAs($this->user)->getJson('/api/todos');
+
+        $response->assertStatus(200);
+
+        $response->assertJsonCount($count_items, 'items');
+    }
+
+    public function test_user_todo_list_empty(): void
+    {
+        $count_items = 0;
+
+        $response = $this->actingAs($this->user)->getJson('/api/todos');
+
+        $response->assertStatus(200);
+
+        $response->assertJsonCount($count_items, 'items');
+    }
 }
