@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\TodoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,3 +31,5 @@ Route::controller(CategoryController::class)->middleware('auth:sanctum')->group(
     Route::put('categories/{id}', 'update');
     Route::delete('categories/{id}', 'destroy');
 });
+
+Route::middleware('auth:sanctum')->apiResource('todos', TodoController::class);
