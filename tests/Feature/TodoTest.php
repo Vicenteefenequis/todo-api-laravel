@@ -16,6 +16,7 @@ class TodoTest extends TestCase
 
     private User $user;
     private Category $category;
+    private const PATH_TO_CREATE_TODOS = '/api/v1/todos';
 
 
     protected function setUp(): void
@@ -35,7 +36,7 @@ class TodoTest extends TestCase
         $name = 'Limpeza';
         $description = 'Limpar Armario';
 
-        $response = $this->actingAs($this->user)->postJson('/api/todos', [
+        $response = $this->actingAs($this->user)->postJson(self::PATH_TO_CREATE_TODOS, [
             'name' => $name,
             'description' => $description,
             'category_id' => $this->category->id
@@ -57,7 +58,7 @@ class TodoTest extends TestCase
         $name = 'Limpeza';
         $description = 'Limpar Armario';
 
-        $response = $this->postJson('/api/todos', [
+        $response = $this->postJson(self::PATH_TO_CREATE_TODOS, [
             'name' => $name,
             'description' => $description,
             'category_id' => $this->category->id
@@ -74,7 +75,7 @@ class TodoTest extends TestCase
         $name = 'Limpeza';
         $description = 'Limpar Armario';
 
-        $response = $this->actingAs($this->user)->postJson('/api/todos', [
+        $response = $this->actingAs($this->user)->postJson(self::PATH_TO_CREATE_TODOS, [
             'name' => $name,
             'description' => $description,
         ]);
@@ -95,7 +96,7 @@ class TodoTest extends TestCase
         ]);
 
 
-        $response = $this->actingAs($this->user)->getJson('/api/todos');
+        $response = $this->actingAs($this->user)->getJson(self::PATH_TO_CREATE_TODOS);
 
         $response->assertStatus(200);
 
@@ -106,7 +107,7 @@ class TodoTest extends TestCase
     {
         $count_items = 0;
 
-        $response = $this->actingAs($this->user)->getJson('/api/todos');
+        $response = $this->actingAs($this->user)->getJson(self::PATH_TO_CREATE_TODOS);
 
         $response->assertStatus(200);
 
@@ -121,7 +122,7 @@ class TodoTest extends TestCase
             'category_id' => $this->category->id
         ]);
 
-        $response = $this->actingAs($this->user)->getJson("/api/todos/{$todo->id}");
+        $response = $this->actingAs($this->user)->getJson(self::PATH_TO_CREATE_TODOS . "/{$todo->id}");
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -133,8 +134,7 @@ class TodoTest extends TestCase
     {
 
 
-
-        $response = $this->actingAs($this->user)->getJson("/api/todos/not_found_id");
+        $response = $this->actingAs($this->user)->getJson(self::PATH_TO_CREATE_TODOS . "/not_found_id");
 
         $response->assertStatus(404);
         $response->assertJson([
@@ -150,7 +150,7 @@ class TodoTest extends TestCase
             'category_id' => $this->category->id
         ]);
 
-        $response = $this->actingAs($this->user)->deleteJson("/api/todos/{$todo->id}");
+        $response = $this->actingAs($this->user)->deleteJson(self::PATH_TO_CREATE_TODOS . "/{$todo->id}");
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -161,11 +161,50 @@ class TodoTest extends TestCase
     public function test_user_todo_delete_not_found()
     {
 
-        $response = $this->actingAs($this->user)->deleteJson("/api/todos/not_found_id");
+        $response = $this->actingAs($this->user)->deleteJson(self::PATH_TO_CREATE_TODOS . "/not_found_id");
 
         $response->assertStatus(404);
         $response->assertJson([
             'message' => 'Todo with id not_found_id not found'
+        ]);
+    }
+
+    public function test_user_todo_update_with_success()
+    {
+        $todo = Todo::factory()->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+        $another_category = Category::factory()->forUser($this->user->id)->create();
+
+        $response = $this->actingAs($this->user)->putJson(self::PATH_TO_CREATE_TODOS . "/{$todo->id}", [
+            'name' => 'another_name',
+            'description' => 'another description',
+            'category_id' => $another_category->id
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'name' => 'another_name',
+            'description' => 'another description',
+        ]);
+    }
+
+
+    public function test_user_todo_update_not_found()
+    {
+        $another_category = Category::factory()->forUser($this->user->id)->create();
+
+        $response = $this->actingAs($this->user)->putJson(self::PATH_TO_CREATE_TODOS . "/not_found", [
+            'name' => 'another_name',
+            'description' => 'another description',
+            'category_id' => $another_category->id
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Todo with id not_found not found'
         ]);
     }
 
