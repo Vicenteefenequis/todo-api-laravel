@@ -13,6 +13,7 @@ class CategoryTest extends TestCase
     use RefreshDatabase, WithFaker;
 
     private User $user;
+    private const PATH_TO_CREATE_CATEGORY = '/api/v1/categories';
 
 
     protected function setUp(): void
@@ -23,7 +24,7 @@ class CategoryTest extends TestCase
 
     public function test_user_can_create_category(): void
     {
-        $response = $this->actingAs($this->user)->postJson('/api/categories', [
+        $response = $this->actingAs($this->user)->postJson(self::PATH_TO_CREATE_CATEGORY, [
             'name' => 'Esportes',
             'color' => ' #FF0000'
         ]);
@@ -37,7 +38,7 @@ class CategoryTest extends TestCase
 
     public function test_user_cannot_create_category_without_authentication(): void
     {
-        $response = $this->postJson('/api/categories', [
+        $response = $this->postJson(self::PATH_TO_CREATE_CATEGORY, [
             'name' => 'Esportes',
             'color' => ' #FF0000'
         ]);
@@ -47,7 +48,7 @@ class CategoryTest extends TestCase
 
     public function test_user_create_category_with_color_invalid(): void
     {
-        $response = $this->actingAs($this->user)->postJson('/api/categories', [
+        $response = $this->actingAs($this->user)->postJson(self::PATH_TO_CREATE_CATEGORY, [
             'name' => 'Esportes',
             'color' => 'invalid_color'
         ]);
@@ -55,7 +56,7 @@ class CategoryTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJson([
-            'message' => 'Color is not valid!'
+            'message' => 'Color invalid_color is not valid!'
         ]);
     }
 
@@ -66,13 +67,13 @@ class CategoryTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-                         ->getJson("/api/categories/{$category->id}");
-        
+            ->getJson(self::PATH_TO_CREATE_CATEGORY . "/{$category->id}");
+
         $response->assertStatus(200);
         $response->assertJson([
             'id' => $category->id,
             'name' => $category->name,
-            'color' =>$category->color,
+            'color' => $category->color,
             'created_at' => $category->created_at,
             'updated_at' => $category->updated_at
         ]);
@@ -86,8 +87,8 @@ class CategoryTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-                         ->getJson("/api/categories/{$category->id}");
-        
+            ->getJson(self::PATH_TO_CREATE_CATEGORY . "{$category->id}");
+
         $response->assertStatus(404);
     }
 
@@ -98,8 +99,8 @@ class CategoryTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-                         ->deleteJson("/api/categories/{$category->id}");
-        
+            ->deleteJson(self::PATH_TO_CREATE_CATEGORY . "/{$category->id}");
+
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
@@ -114,8 +115,8 @@ class CategoryTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->deleteJson("/api/categories/{$category->id}");
-        
+            ->deleteJson(self::PATH_TO_CREATE_CATEGORY . "{$category->id}");
+
         $response->assertStatus(404);
         $this->assertDatabaseHas('categories', ['id' => $category->id]);
     }
@@ -128,8 +129,8 @@ class CategoryTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->getJson("/api/categories");
-        
+            ->getJson(self::PATH_TO_CREATE_CATEGORY);
+
         $response->assertStatus(200);
 
         $response->assertJsonCount(3, 'items');
@@ -144,7 +145,7 @@ class CategoryTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $response = $this->actingAs($this->user)->putJson("/api/categories/{$category->id}", [
+        $response = $this->actingAs($this->user)->putJson(self::PATH_TO_CREATE_CATEGORY . "/{$category->id}", [
             'name' => $name,
             'color' => $color
         ]);
@@ -168,7 +169,7 @@ class CategoryTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $response = $this->actingAs($this->user)->putJson("/api/categories/{$category->id}", [
+        $response = $this->actingAs($this->user)->putJson(self::PATH_TO_CREATE_CATEGORY . "/{$category->id}", [
             'name' => $name,
             'color' => $color
         ]);
@@ -176,7 +177,7 @@ class CategoryTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJson([
-            'message' => 'Color is not valid!'
+            'message' => "Color {$color} is not valid!"
         ]);
     }
 }

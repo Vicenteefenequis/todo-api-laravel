@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\TodoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,18 +16,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::controller(AuthController::class)->group(function () {
-    Route::post('register', 'register');
-    Route::post('login', 'login');
-    Route::get('me', 'profile')->middleware('auth:sanctum');
-    Route::get('logout', 'logout')->middleware('auth:sanctum');
+Route::prefix('v1')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('me', [AuthController::class, 'me']);
+        Route::get('logout', [AuthController::class, 'logout']);
+
+        Route::apiResource('categories', CategoryController::class);
+
+        Route::group(['prefix' => 'todos'], function (){
+            Route::get('/', [TodoController::class, 'index']);
+            Route::post('/', [TodoController::class, 'store']);
+            Route::get('/{id}', [TodoController::class, 'show']);
+            Route::put('/{id}', [TodoController::class, 'update']);
+            Route::delete('/{id}', [TodoController::class, 'destroy']);
+            Route::patch('/{id}/status', [TodoController::class, 'change_status']);
+        });
+    });
 });
 
 
-Route::controller(CategoryController::class)->middleware('auth:sanctum')->group(function () {
-    Route::get('categories', 'index');
-    Route::post('categories', 'store');
-    Route::get('categories/{id}', 'show');
-    Route::put('categories/{id}', 'update');
-    Route::delete('categories/{id}', 'destroy');
-});

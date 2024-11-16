@@ -20,7 +20,14 @@ class CategoryFactory extends Factory
         return [
             'id' => (string) Str::uuid(),
             'name' => $this->faker->name(),
-            'color' => $this->faker->hexColor()
+            'color' => $this->faker->hexColor(),
+            'user_id' => (string) Str::uuid(),
         ];
+    }
+
+    public function forUser(string $userId){
+        return $this->state([
+            'user_id' => $userId
+        ]);
     }
 }
