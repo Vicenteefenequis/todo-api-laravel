@@ -10,6 +10,7 @@ use Auth;
 
 class CreateCategoryService
 {
+    private const VALID_HEX_COLOR_PATTERN = '/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/';
     public function execute(CategoryCreateInputDto $input): CategoryCreateOutputDto
     {
         $user = Auth::user();
@@ -35,6 +36,6 @@ class CreateCategoryService
 
     private function isValidHexColor(string $color): bool
     {
-        return preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $color);
+        return preg_match(self::VALID_HEX_COLOR_PATTERN, $color);
     }
 }

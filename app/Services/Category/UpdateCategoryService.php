@@ -13,9 +13,11 @@ use App\Services\Exception\{
 
 class UpdateCategoryService
 {
+    private const VALID_HEX_COLOR_PATTERN = '/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/';
+
     public function execute(CategoryUpdateInputDto $input): CategoryUpdateOutputDto
     {
-        $category =  Category::find($input->id);
+        $category = Category::find($input->id);
 
         if (!$category) {
             throw new NotFoundException(sprintf('category with id %s not found', $input->id));
@@ -43,6 +45,6 @@ class UpdateCategoryService
 
     private function isValidHexColor(string $color): bool
     {
-        return preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $color);
+        return preg_match(self::VALID_HEX_COLOR_PATTERN, $color);
     }
 }
