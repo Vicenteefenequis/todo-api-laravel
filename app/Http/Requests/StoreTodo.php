@@ -55,7 +55,7 @@ class StoreTodo extends FormRequest
         return new TodoCreateInputDto(
             name: $this->input('name'),
             description: $this->input('description'),
-            status: $this->input('status'),
+            status: Status::tryFrom($this->input('status')),
             category_id: $this->input('category_id'),
         );
     }
