@@ -208,5 +208,50 @@ class TodoTest extends TestCase
         ]);
     }
 
+    public function test_user_todo_change_status_with_success()
+    {
+        $todo = Todo::factory()->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+        $response = $this->actingAs($this->user)->patchJson(self::PATH_TO_CREATE_TODOS . "/{$todo->id}/status", [
+            'status' => 'completed',
+        ]);
+
+        $response->assertStatus(204);
+    }
+
+
+    public function test_user_todo_change_status_with_error_status_unknown()
+    {
+        $todo = Todo::factory()->create([
+            'user_id' => $this->user->id,
+            'category_id' => $this->category->id
+        ]);
+
+        $response = $this->actingAs($this->user)->patchJson(self::PATH_TO_CREATE_TODOS . "/{$todo->id}/status", [
+            'status' => 'unknown_status',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'The selected status is invalid.'
+        ]);
+    }
+
+    public function test_user_todo_change_status_with_not_found_todo()
+    {
+
+        $response = $this->actingAs($this->user)->patchJson(self::PATH_TO_CREATE_TODOS . "/not_found_id/status", [
+            'status' => 'pending',
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Todo with id not_found_id not found'
+        ]);
+    }
+
 
 }
