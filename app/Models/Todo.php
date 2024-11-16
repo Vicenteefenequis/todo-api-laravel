@@ -17,14 +17,5 @@ class Todo extends Model
         'status' => Status::class
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
 
-        static::creating(function ($todo) {
-            if (is_null($todo->status)) {
-                $todo->status = Status::PENDING->value;
-            }
-        });
-    }
 }
