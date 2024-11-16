@@ -26,7 +26,15 @@ Route::prefix('v1')->group(function () {
         Route::get('logout', [AuthController::class, 'logout']);
 
         Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('todos', TodoController::class);
+
+        Route::group(['prefix' => 'todos'], function (){
+            Route::get('/', [TodoController::class, 'index']);
+            Route::post('/', [TodoController::class, 'store']);
+            Route::get('/{id}', [TodoController::class, 'show']);
+            Route::put('/{id}', [TodoController::class, 'update']);
+            Route::delete('/{id}', [TodoController::class, 'destroy']);
+            Route::patch('/{id}/status', [TodoController::class, 'change_status']);
+        });
     });
 });
 
