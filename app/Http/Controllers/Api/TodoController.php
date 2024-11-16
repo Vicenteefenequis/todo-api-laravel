@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangeStatusTodo;
 use App\Http\Requests\StoreTodo;
 use App\Http\Requests\UpdateTodo;
 use App\Services\DTO\Todo\TodoInputDto;
+use App\Services\Todo\ChangeStatusTodoService;
 use App\Services\Todo\CreateTodoService;
 use App\Services\Todo\DeleteTodoService;
 use App\Services\Todo\ListTodoService;
@@ -45,5 +47,12 @@ class TodoController extends Controller
         $output = $updateTodoService->execute($request->toDTO());
 
         return response()->json($output);
+    }
+
+    public function change_status(string $id, ChangeStatusTodo $request, ChangeStatusTodoService $changeStatusTodoService)
+    {
+        $changeStatusTodoService->execute($request->toDTO());
+
+        return response(null, 204);
     }
 }
