@@ -18,7 +18,7 @@ class UpdateCategoryService
 
     public function execute(CategoryUpdateInputDto $input): CategoryUpdateOutputDto
     {
-        if (!HexColor::make($input->color)->is_valid()) {
+        if (!HexColor::is_valid($input->color)) {
             throw new EntityValidationException(sprintf("Color {$input->color} is not valid!"));
         }
 
