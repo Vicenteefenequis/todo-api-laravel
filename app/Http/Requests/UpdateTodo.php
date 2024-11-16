@@ -55,7 +55,7 @@ class UpdateTodo extends FormRequest
     public function toDTO(): TodoUpdateInputDto
     {
         return new TodoUpdateInputDto(
-            id: (string)$this->route('todo'),
+            id: (string)$this->route('id'),
             name: $this->input('name'),
             description: $this->input('description'),
             category_id: $this->input('category_id'),
