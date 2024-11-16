@@ -16,20 +16,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::controller(AuthController::class)->group(function () {
-    Route::post('register', 'register');
-    Route::post('login', 'login');
-    Route::get('me', 'profile')->middleware('auth:sanctum');
-    Route::get('logout', 'logout')->middleware('auth:sanctum');
+Route::prefix('v1')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('me', [AuthController::class, 'me']);
+        Route::get('logout', [AuthController::class, 'logout']);
+
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('todos', TodoController::class);
+    });
 });
 
 
-Route::controller(CategoryController::class)->middleware('auth:sanctum')->group(function () {
-    Route::get('categories', 'index');
-    Route::post('categories', 'store');
-    Route::get('categories/{id}', 'show');
-    Route::put('categories/{id}', 'update');
-    Route::delete('categories/{id}', 'destroy');
-});
-
-Route::middleware('auth:sanctum')->apiResource('todos', TodoController::class);
