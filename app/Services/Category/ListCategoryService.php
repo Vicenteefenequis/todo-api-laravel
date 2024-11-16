@@ -3,10 +3,8 @@
 
 namespace App\Services\Category;
 
-use App\Models\Category;
 use App\Services\DTO\Category\CategoryInputDto;
 use App\Services\DTO\Category\CategoryOutputDto;
-use App\Services\Exception\CategoryException;
 use App\Services\Exception\NotFoundException;
 use Auth;
 
@@ -16,9 +14,7 @@ class ListCategoryService
 
     public function execute(CategoryInputDto $input): CategoryOutputDto
     {
-        $category = Auth::user()->categories()->find($input->id);
-
-        if (!$category) {
+        if (!$category = Auth::user()->categories()->find($input->id)) {
             throw new NotFoundException(sprintf('Category not found with id %s', $input->id));
         }
 

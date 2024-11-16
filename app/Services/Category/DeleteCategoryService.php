@@ -13,9 +13,7 @@ class DeleteCategoryService
 {
     public function execute(CategoryInputDto $input): CategoryDeleteOutputDto
     {
-        $category = Auth::user()->categories()->find($input->id);
-
-        if (!$category) {
+        if (!$category = Auth::user()->categories()->find($input->id)) {
             throw new NotFoundException(sprintf('Category not found with id %s', $input->id));
         }
 

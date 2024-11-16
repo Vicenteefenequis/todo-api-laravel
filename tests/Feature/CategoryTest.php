@@ -56,7 +56,7 @@ class CategoryTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJson([
-            'message' => 'Color is not valid!'
+            'message' => 'Color invalid_color is not valid!'
         ]);
     }
 
@@ -177,7 +177,7 @@ class CategoryTest extends TestCase
         $response->assertStatus(422);
 
         $response->assertJson([
-            'message' => 'Color is not valid!'
+            'message' => "Color {$color} is not valid!"
         ]);
     }
 }

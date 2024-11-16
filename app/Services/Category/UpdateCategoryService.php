@@ -3,9 +3,11 @@
 
 namespace App\Services\Category;
 
+use App\Config\Validate\HexColor;
 use App\Models\Category;
 use App\Services\DTO\Category\Update\CategoryUpdateInputDto;
 use App\Services\DTO\Category\Update\CategoryUpdateOutputDto;
+use Illuminate\Support\Facades\Auth;
 use App\Services\Exception\{
     NotFoundException,
     EntityValidationException
@@ -13,18 +15,15 @@ use App\Services\Exception\{
 
 class UpdateCategoryService
 {
-    private const VALID_HEX_COLOR_PATTERN = '/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/';
 
     public function execute(CategoryUpdateInputDto $input): CategoryUpdateOutputDto
     {
-        $category = Category::find($input->id);
-
-        if (!$category) {
-            throw new NotFoundException(sprintf('category with id %s not found', $input->id));
+        if (!HexColor::make($input->color)->is_valid()) {
+            throw new EntityValidationException(sprintf("Color {$input->color} is not valid!"));
         }
 
-        if (!$this->isValidHexColor($input->color)) {
-            throw new EntityValidationException('Color is not valid!');
+        if (!$category = Auth::user()->categories()->find($input->id)) {
+            throw new NotFoundException(sprintf('category with id %s not found', $input->id));
         }
 
         $category->update([
@@ -42,9 +41,4 @@ class UpdateCategoryService
         );
     }
 
-
-    private function isValidHexColor(string $color): bool
-    {
-        return preg_match(self::VALID_HEX_COLOR_PATTERN, $color);
-    }
 }
